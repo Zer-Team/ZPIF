@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Render ZPIF</title>
+    <style>
+        #dropZone {
+            width: 100%;
+            height: 150px;
+            border: 2px dashed #007bff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 18px;
+            color: #007bff;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+        #dropZone.dragover {
+            background-color: #f0f8ff;
+        }
+        canvas {
+            border: 1px solid black;
+            width: 100%;
+            height: 100%;
+        }
+        a {
+            position: absolute;
+            text-decoration: none;
+            color: #007bff;
+            font-size: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #fileInput {
+            display: none;
+        }
+        #output {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <input type="file" id="fileInput">
+    <div id="dropZone">Drag and drop a ZPIF file here or <b>&nbsp;click&nbsp;</b> to select</div>
+    <span id="output"></span>
+    <canvas id="canvas"></canvas>
+    <a href="https://github.com/Zer-Team/ZPIF">ZPIF github</a>
+    <script src="js.js"></script>
+</body>
+</html>
