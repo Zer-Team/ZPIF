@@ -74,7 +74,7 @@ public class main {
         int factor = Integer.parseInt(factorStr);
 
         // Создание окна
-        JFrame frame = new JFrame("Image Viewer");
+        JFrame frame = new JFrame("ZPIF Render Java");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Панель для отрисовки изображения

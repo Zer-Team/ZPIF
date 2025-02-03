@@ -123,7 +123,7 @@ def render_image(image):
 
 # Создание GUI-интерфейса с помощью Tkinter
 root = tk.Tk()
-root.title("ZPIF Renderer")
+root.title("ZPIF Render Python")
 
 # Создание холста для отображения изображения
 canvas = tk.Canvas(root)

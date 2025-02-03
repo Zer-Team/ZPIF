@@ -92,7 +92,7 @@ fn main() -> io::Result<()> {
 
     // Окно для отрисовки
     let mut window = Window::new(
-        "ZPIF Render",
+        "ZPIF Render Rust",
         (imageWidth as f64 * factor) as usize,
         (imageHeight as f64 * factor) as usize,
         WindowOptions {
