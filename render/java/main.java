@@ -40,7 +40,6 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Scanner;
 
 public class main {
     // Функция для чтения unsigned short из файла в формате big-endian
@@ -59,17 +58,18 @@ public class main {
     public static void main(String[] args) {
         // Размеры изображения и point (объявления)
         long imageWidth = 0, imageHeight = 0, imagePoint = 0;
-        // Создания объекта Scanner для чтения ввода от пользователя
-        Scanner scanner = new Scanner(System.in);
 
-        // Запрос у пользователя путь к файлу
-        System.out.print("Enter the path to the file: ");
-        String filePath = scanner.nextLine();
+        // Проверка количества аргументов
+        if (args.length < 1) {
+            System.out.println("\u001B[1;33mUsage: java  main <path_to_zpi_file> [factor]\u001B[0m");
+            System.exit(1); // Завершение программы
+        }
 
-        // Запрос у пользователя factor`a
-        System.out.print("Enter the scale factor (integer): ");
-        String factorStr = scanner.nextLine();
-        int factor = Integer.parseInt(factorStr);
+        // Получения пут# к файлу
+        String filePath = args[0];
+
+        // Factor
+        int factor = args.length < 2 ? 1 : Integer.parseInt(args[1]);
 
         // Создание окна
         JFrame frame = new JFrame("ZPIF Render Java");
@@ -89,7 +89,7 @@ public class main {
             bytesRead = fis.read(buffer);
 
             if (bytesRead != 6 || buffer[0] == 0x89 && buffer[1] == 0x5A && buffer[2] == 0x50 && buffer[3] == 0x49 && buffer[4] == 0x46 && buffer[5] == 0x0A) {
-                System.out.println("Error 1: The file is damaged or the format is not supported.");
+                System.out.println("\\u001B[1;31mError 1: The file is damaged or the format is not supported.\u001B[0m");
                 System.exit(1); // Завершение программы
             }
 
@@ -146,10 +146,7 @@ public class main {
 
         } catch (IOException e) {
             // Обработка ошибок
-            System.err.println("Error opening file: " + e.getMessage());
-        } finally {
-            // Закрытие Scanner
-            scanner.close();
+            System.err.println("\u001B[1;31mError opening file:\u001B[0m " + e.getMessage());
         }
     }
 }
