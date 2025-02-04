@@ -36,9 +36,7 @@
 // Библиотеки
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
