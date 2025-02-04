@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZPIF Render HTML / JavaScript</title>
     <style>
+        body {
+            font-family: Sans-Serif;
+        }
         #dropZone {
             width: 100%;
             height: 150px;
@@ -24,7 +27,7 @@
         canvas {
             border: 1px solid black;
             width: 100%;
-            height: 100%;
+            height: auto;
         }
         a {
             position: absolute;
@@ -47,7 +50,7 @@
 </head>
 <body>
     <input type="file" id="fileInput">
-    <div id="dropZone">Drag and drop a ZPIF file here or <b>&nbsp;click&nbsp;</b> to select</div>
+    <div id="dropZone"><span>Drag and drop a ZPIF file here or <b>click</b> to select</span></div>
     <span id="output"></span>
     <canvas id="canvas"></canvas>
     <a href="https://github.com/Zer-Team/ZPIF">ZPIF github</a>
