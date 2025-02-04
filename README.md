@@ -2,89 +2,93 @@
 
 **English (translation)**
 
-# ZPIF File Format Description
+# ZPIF File Format Description  
 
-ZPIF (ZerProjectImageFormat) is an open raster format for storing graphical information.
+ZPIF (Zer Project Image Format) is a free raster format for storing graphical information.  
 
-## File Structure
+## File Structure  
 
-A ZPIF file consists of data blocks called **chunks**, each 6 bytes in size. Types of chunks:
+A ZPIF file consists of data blocks called **chunks**, each 6 bytes in size. Types of chunks:  
 
-1. **Header Chunk** — Always at the beginning of the file, used for identification.
-2. **Parameter Chunks** — Define image properties (width, height, etc.).
-3. **Structuring Chunks** — Mark the start of pixel data and the end of the file.
-4. **Pixel Chunks** — Contain pixel color information.
+1. **Header Chunk** — Always at the beginning of the file, used for identification.  
+2. **Parameter Chunks** — Define image properties (width, height, etc.).  
+3. **Structuring Chunks** — Mark the beginning of pixel data and the end of the file.  
+4. **Pixel Chunks** — Contain pixel color information.  
 
-## Header Chunk
+## Header Chunk  
 
-The first chunk of the file always contains the signature `89 5A 50 49 46 0A` in hexadecimal (hex) format, or `�ZPIF` in text representation. This signature allows programs to identify the file as a ZPIF format file.
+The first chunk of the file always contains the signature `89 5A 50 49 46 0A` in hexadecimal (hex) format or `�ZPIF` in text representation. This signature allows programs to identify the file as a ZPIF format file.  
 
-## Parameter Chunks (Image Properties)
+## Parameter Chunks (Image Properties)  
 
-Parameter chunks consist of two parts:
+Parameter chunks consist of two parts:  
 
-- **Name Block** (1 byte) — Contains an English letter representing the parameter name.
-- **Data Block** (5 bytes) — Stores the parameter value. If the data is smaller than 5 bytes, the remaining bytes are filled with `00`.
+- **Name Block** (1 byte) — Contains an English letter representing the parameter name.  
+- **Data Block** (5 bytes) — Stores parameter data. If the data is less than 5 bytes, the remaining bytes are filled with `00`.  
 
-**Example:** `77 00 00 00 02 00`
+**Example:** `77 00 00 00 02 00`  
 
-- `77` (letter `w`) indicates the width parameter.
-- `00 00 00 02` — width value (`2`) in big-endian format.
-- `00` — unused byte.
+- `77` (letter `w`) indicates that this is the width parameter.  
+- `00 00 00 02` — Width value (`2`) in big-endian format.  
+- `00` — Unused byte.  
 
-### Supported Parameters
+### Supported Parameters  
 
-#### Required Parameters (hex)
+#### Mandatory Parameters (hex)  
 
-- `77 00 00 04 38 00` — Image width (1080 pixels). (`77` - `w`, `00 00 04 38` - `1080`, `00` - unused).
-- `68 00 00 04 42 00` — Image height (1090 pixels). (`68` - `h`, `00 00 04 42` - `1090`, `00` - unused).
+- `77 00 00 04 38 00` — Image width (1080 pixels). (`77` - `w`, `00 00 04 38` - `1080`, 4 bytes storing values from 0 to 4,294,967,295, `00` - unused).  
+- `68 00 00 04 42 00` — Image height (1090 pixels). (`68` - `h`, `00 00 04 42` - `1090`, 4 bytes storing values from 0 to 4,294,967,295, `00` - unused).  
 
-#### Optional Parameters (hex)
+#### Optional Parameters (hex)  
 
-- `74 07 E9 02 01 0D` — File creation date. (`74` - `t`, `07 E9` - year, `02` - month, `01` - day, `0D` - hour).
-- `75 02 00 00 00 00` — Time offset relative to UTC. (`75` - `u`, `02` - `+2`, `00 00 00 00` - unused).
+- `74 07 E9 02 01 0D` — File creation date. (`74` - `t`, `07 E9` - year, `02` - month, `01` - day, `0D` - hour).  
+- `75 02 00 00 00 00` — Time offset relative to UTC. (`75` - `u`, `02` - `+2`, `00 00 00 00` - unused).  
 
-## Structuring Chunks
+## Structuring Chunks  
 
-Structuring chunks are recorded in the format `00 00 XX XX XX XX` and define the data structure:
+Structuring chunks are written in the format `00 00 XX XX XX XX` and define the data structure:  
 
-- `00 00 FF FF FF FF` — Start of pixel data.
-- `00 00 00 00 00 00` — End of file.
+- `00 00 FF FF FF FF` — Start of pixel data.  
+- `00 00 00 00 00 00` — End of file.  
 
-## Pixel Chunks
+## Pixel Chunks  
 
-Pixel data is recorded in chunks consisting of two blocks:
+Pixel data is stored in chunks consisting of two blocks:  
 
-- **First Block** (2 bytes) — Used for RLE compression (Run-Length Encoding). Stores a number from 0 to 65535 in big-endian format. **Important:** If both bytes are `00`, it is interpreted as a structuring chunk.
-- **Second Block** (4 bytes) — Pixel color in RGBA format (red, green, blue, alpha channel).
+- **First Block** (2 bytes) — Used for Run-Length Encoding (RLE) compression. Stores a number from 0 to 65,535 in big-endian format. **Important:** If both bytes are `00`, this is interpreted as a structuring chunk.  
+- **Second Block** (4 bytes) — Pixel color in RGBA format (red, green, blue, alpha channel).  
 
-Pixels are written from left to right, top to bottom.
+Pixels are recorded from left to right, top to bottom.  
 
-## Chunk Recording Order
+## Chunk Writing Order  
 
-1. **Parameter Chunks** Recorded in arbitrary order.
-2. **Start of Pixel Data Chunk** `00 00 FF FF FF FF`.
-3. **Pixel Chunks** Pixel color data.
-4. **End of File Chunk** `00 00 00 00 00 00`, marking the end of the file.
+1. **Header Chunk** is always written first.  
+2. **Parameter Chunks** can be written in any order.  
+3. **Start of Pixel Data Chunk** `00 00 FF FF FF FF`.  
+4. **Pixel Chunks** store pixel colors from left to right, top to bottom.  
+5. **End of File Chunk** `00 00 00 00 00 00`, marking the end of the file.  
 
-## ZPIF File Examples
+## ZPIF File Examples  
 
-### Example 1 (Binary Representation in Hex)
-
-```
-89 5A 50 49 46 0A 77 00 00 00 02 00 68 00 00 00 02 00 74 07 E9 02 01 0C 00 00 FF FF FF FF 00 04 FF 00 00 FF 00 00 00 00 00 00
-```
-
-### Example 2 (Text Representation, bytes that are not displayed are replaced by `N`)
+### Example 1 (Binary Representation in Hex)  
 
 ```
-�ZPIF
-wNNNNNhNNNNNtN�NNNNN����NN�NN�NNNNNN
+89 5A 50 49 46 0A 77 00 00 00 02 00  
+68 00 00 00 02 00 74 07 E9 02 01 0C  
+00 00 FF FF FF FF 00 04 FF 00 00 FF  
+00 00 00 00 00 00  
+```  
+
+### Example 2 (Text Representation, Non-Displayable Bytes Replaced with `N`)  
+
 ```
+�ZPIF  
+wNNNNNhNNNNNtN�NNNNN����NN�NN�NNNNNN  
+```  
 
-## Notes
+## Notes  
 
-1. After the `00 00 00 00 00 00` (end of file) chunk, any data may follow, but this should be avoided.
+1. Any data written after the `00 00 00 00 00 00` (end-of-file chunk) is allowed but should be avoided.  
 
 <br>
 
@@ -92,7 +96,7 @@ wNNNNNhNNNNNtN�NNNNN����NN�NN�NNNNNN
 
 # Описание формата файлов ZPIF
 
-ZPIF (ZerProjectImageFormat) — это свободный растровый формат для хранения графической информации.
+ZPIF (Zer Project Image Format) — это свободный растровый формат для хранения графической информации.
 
 ## Структура файла
 
@@ -124,8 +128,8 @@ ZPIF (ZerProjectImageFormat) — это свободный растровый ф
 
 #### Обязательные параметры (hex)
 
-- `77 00 00 04 38 00` — Ширина изображения (1080 пикселей). (`77` - `w`, `00 00 04 38` - `1080`, `00` - не используется).
-- `68 00 00 04 42 00` — Высота изображения (1090 пикселей). (`68` - `h`, `00 00 04 42` - `1090`, `00` - не используется).
+- `77 00 00 04 38 00` — Ширина изображения (1080 пикселей). (`77` - `w`, `00 00 04 38` - `1080` 4 байта хранящии числа от 0 до 4,294,967,295, `00` - не используется).
+- `68 00 00 04 42 00` — Высота изображения (1090 пикселей). (`68` - `h`, `00 00 04 42` - `1090` 4 байта хранящии числа от 0 до 4,294,967,295, `00` - не используется).
 
 #### Необязательные параметры (hex)
 
@@ -150,17 +154,21 @@ ZPIF (ZerProjectImageFormat) — это свободный растровый ф
 
 ## Порядок записи чанков
 
-1. **Чанки параметров** Записываются в произвольном порядке.
-2. **Чанк начала данных пикселей**  `00 00 FF FF FF FF`.
-3. **Чанки пикселей** Данные о цвете пикселей.
-4. **Чанк конца файла** `00 00 00 00 00 00`,  обозначает конец файла.
+1. **Заголовочный чанк** Записывается самым первым.
+2. **Чанки параметров** Записываются в произвольном порядке.
+3. **Чанк начала данных пикселей**  `00 00 FF FF FF FF`.
+4. **Чанки пикселей** Записывают цвета пикселей слева на права, сверху вниз.
+5. **Чанк конца файла** `00 00 00 00 00 00`,  обозначает конец файла.
 
 ## Примеры файлов ZPIF
 
 ### Пример 1 (бинарное представление в hex)
 
 ```
-89 5A 50 49 46 0A 77 00 00 00 02 00 68 00 00 00 02 00 74 07 E9 02 01 0C 00 00 FF FF FF FF 00 04 FF 00 00 FF 00 00 00 00 00 00
+89 5A 50 49 46 0A 77 00 00 00 02 00 
+68 00 00 00 02 00 74 07 E9 02 01 0C 
+00 00 FF FF FF FF 00 04 FF 00 00 FF 
+00 00 00 00 00 00
 ```
 
 ### Пример 2 (текстовое представление, байты которые не отображаются заменены на `N`)
@@ -172,4 +180,4 @@ wNNNNNhNNNNNtN�NNNNN����NN�NN�NNNNNN
 
 ## Примечания
 
-1. После чанка `00 00 00 00 00 00` (конца файла) могут быть любые данные, но этого следует избегать.
+1. После чанка `00 00 00 00 00 00` (конца файла) могут быть записаны любые данные, но этого следует избегать.
