@@ -6,6 +6,7 @@
 
 - **C**  
 - **C++**  
+- **C#**  
 - **Go**  
 - **Java**  
 - **HTML / JavaScript**  
@@ -22,7 +23,7 @@
 
 - **C**
 - **C++**
-- **C#**
+- **CENSORED**
 - **Go**
 - **Java**
 - **HTML** / **JavaScript**
