@@ -23,9 +23,9 @@
 */
 
 ////////////////////////////////////////////////////////////////
-///                       GCC   14.2.1                       ///
+///                        GCC 14.2.1                        ///
 ///                        SFML 2.6.2                        ///
-///                         C++   20                         ///
+///                          C++ 20                          ///
 ////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////
@@ -68,16 +68,16 @@ int main(int argc, char *argv[])
     // Проверка на корректность аргументов
     if (argc < 2)
     {
-        cerr << "\033[1;33mUsage: " << argv[0] << " <file_path> [factor]\033[0m" << endl;
+        cerr << "\033[1;33mUsage: " << argv[0] << " <path_to_zpif_file> [factor]\033[0m" << endl;
         return 1;
     }
        
     // Переменные и тд
-    uint32_t              imageWidth = {0},  // Ширина изображения
-                          imageHeight = {0}, // Высота изображения
-                          factor = {0};      // Фактор для увелечения
-    uint64_t              pixelPoint = {0};  // Номер пикселя
-    std::vector<u_int8_t> buffer(6, 0x00);   // Буфер для хранения чанка
+    uint32_t              imageWidth  = {0}, // Ширина изображения
+                          imageHeight = {0}; // Высота изображения
+    uint16_t              factor      = {0}; // Фактор для увелечения
+    uint64_t              pixelPoint  = {0}; // Номер пикселя
+    std::vector<u_int8_t> buffer  (6, 0x00); // Буфер для хранения чанка
 
     if (argc > 2)
         factor = atoi(argv[2]);
@@ -207,11 +207,13 @@ int main(int argc, char *argv[])
 
         // Отрисовка
         window.clear(sf::Color::White);
-        // window.draw(backgroundSprite);
+        window.draw(backgroundSprite);
         window.draw(sprite);
         window.display();
     }
 
+    // Закрытие файла
+    inputFile.close();
 
     return 0;
 }

@@ -26,11 +26,12 @@
 ///                       rustc 1.84.0                       ///
 ///                      non_snake_case                      ///
 ///                      minifb  0.28.0                      ///
+///                           RUST                           ///
 ////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////
 ///                        ID: HM0100                        ///
-///                     Date: 2025-02-03                     ///
+///                     Date: 2025-02-04                     ///
 ///                     Author: Zer Team                     ///
 ////////////////////////////////////////////////////////////////
 
@@ -56,7 +57,7 @@ fn main() -> io::Result<()> {
 
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        eprintln!("\x1b[1;33mUsage: {} <file_path> [factor]\x1b[0m", args[0]);
+        eprintln!("\x1b[1;33mUsage: {} <path_to_zpif_file> [factor]\x1b[0m", args[0]);
         std::process::exit(1);
     }
 
@@ -124,5 +125,8 @@ fn main() -> io::Result<()> {
             .unwrap();
     }
 
+    // Закрытие файла и окна
+    file.close().unwrap();
+    
     Ok(())
 }
