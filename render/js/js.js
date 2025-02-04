@@ -143,7 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
             {
                 console.error("Error 1: The file is damaged or the format is not supported.");
                 alert("Error 1: The file is damaged or the format is not supported.");
-                return 1;    
+                output.innerHTML = ''; // Очистка
+                return 1;
             }
 
             // Парсинг параметров
