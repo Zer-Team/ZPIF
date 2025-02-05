@@ -37,9 +37,9 @@
 // Библиотеки
 #include <iostream>
 #include <string>
-#include <vector>
+#include <array>
 #include <fstream>
-#include <stdint.h>
+#include <cstdint>
 #include <SFML/Graphics.hpp>
 
 // Добавления в область видимости
@@ -48,18 +48,18 @@ using std::cerr;
 using std::endl;
 
 // Функция для чтения unsigned short из файла в формате big-endian
-inline u_short convertBEInShort(const std::vector<u_int8_t> &bytes)
+inline uint16_t convertBEInShort(const std::array<uint8_t, 6> &bytes)
 {
-    return (bytes[0] << 8) | bytes[1];
+    return static_cast<u_int>(bytes[0] << 8) | static_cast<u_int>(bytes[1]);
 }
 
 // Функция для чтения unsigned int из файла в формате big-endian
-inline uint64_t convertBEInInt(const std::vector<u_int8_t> &bytes)
+inline uint32_t convertBEInInt(const std::array<uint8_t, 6> &bytes)
 {
-    return (static_cast<u_int>(bytes[1]) << 24) | // Не с 0 потому что 0 хранит имя параметра 
-           (static_cast<u_int>(bytes[2]) << 16) |
-           (static_cast<u_int>(bytes[3]) << 8)  |
-           (static_cast<u_int>(bytes[4]));
+    return (static_cast<uint32_t>(bytes[1]) << 24) | // Не с 0 потому что 0 хранит имя параметра 
+           (static_cast<uint32_t>(bytes[2]) << 16) |
+           (static_cast<uint32_t>(bytes[3]) << 8)  |
+           (static_cast<uint32_t>(bytes[4]));
 }
 
 // Главная функция
@@ -70,19 +70,19 @@ int main(int argc, char *argv[])
     {
         cerr << "\033[1;33mUsage: " << argv[0] << " <path_to_zpif_file> [factor]\033[0m" << endl;
         return 1;
+    } 
+    else if (argc > 2 && (std::stoi(argv[2]) < 0 || std::stoi(argv[2]) > 65535))
+    {
+        cerr << "\033[1;33mError: The second argument must support a number between 1 and 65535.\033[0m" << endl;
+        return 1;
     }
-       
+    
     // Переменные и тд
-    uint32_t              imageWidth  = {0}, // Ширина изображения
-                          imageHeight = {0}; // Высота изображения
-    uint16_t              factor      = {0}; // Фактор для увелечения
-    uint64_t              pixelPoint  = {0}; // Номер пикселя
-    std::vector<u_int8_t> buffer  (6, 0x00); // Буфер для хранения чанка
-
-    if (argc > 2)
-        factor = atoi(argv[2]);
-    else
-        factor = 1;
+    uint32_t               imageWidth  {0}, // Ширина изображения
+                           imageHeight {0}; // Высота изображения
+    uint16_t               factor      {static_cast<uint16_t>((argc > 2) ? std::stoi(argv[2]) : 1)}; // Фактор для увелечения
+    uint64_t               pixelPoint  {0}; // Номер пикселя
+    std::array<uint8_t, 6> buffer      {};  // Буфер для хранения чанка
 
     // Открытие файла
     std::ifstream inputFile(argv[1], std::ios::binary);
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     inputFile.read(reinterpret_cast<char *>(buffer.data()), buffer.size());
 
     // Проверка чанка заголовка
-    if (buffer != std::vector<u_int8_t>{0x89, 'Z', 'P', 'I', 'F', 0x0A})
+    if (buffer != std::array<u_int8_t, 6>{0x89, 'Z', 'P', 'I', 'F', 0x0A})
     {
         cerr << "\033[1;31mError 1: The file is damaged or the format is not supported.\033[0m" << std::endl;
         return -1;
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     while (inputFile.read(reinterpret_cast<char *>(buffer.data()), buffer.size()))
     {
         // Прекращение чтения при достижении чанка структурирования FF
-        if (buffer == std::vector<u_int8_t>{0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF})
+        if (buffer == std::array<uint8_t, 6>{0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF})
         {
             if (imageWidth <= 0 || imageHeight <= 0)
             {
@@ -123,7 +123,6 @@ int main(int argc, char *argv[])
 
         else if (buffer[0] == 0x68) // h
             imageHeight = convertBEInInt(buffer);
-
     }
          
     // Создания окно
@@ -168,17 +167,15 @@ int main(int argc, char *argv[])
     // Парсинг пикселей из файла (работа с чанками пикселей)
     while (inputFile.read(reinterpret_cast<char *>(buffer.data()), buffer.size()))
     {
-        if (buffer == std::vector<u_int8_t>(6, 0x00))
+        if (buffer == std::array<uint8_t, 6>{0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
             break; // Выход при достижении чанка структурирования 00
 
         uint16_t quantity {convertBEInShort(buffer)};
 
         sf::Color color(buffer[2], buffer[3], buffer[4], buffer[5]);
 
-        while (quantity > 0)
-        {
+        for (uint16_t i = 0; i < quantity; ++i) {
             image.setPixel((pixelPoint % imageWidth), (pixelPoint / imageWidth), color);
-            quantity--;
             pixelPoint++;
         }
     }
@@ -198,11 +195,8 @@ int main(int argc, char *argv[])
         while (window.pollEvent(event))
         {
             // Закрытие окна
-            if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
-            {
-                cout << "\033[33mExit\033[0m" << endl;
+            if (event.type == sf::Event::Closed)
                 window.close();
-            }
         }
 
         // Отрисовка
