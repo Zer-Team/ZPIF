@@ -10,7 +10,7 @@
 - **Go**  
 - **Java**  
 - **HTML / JavaScript**  
-- **CENSORED**  
+- **Python**  
 - **Rust**
 
 <br>
@@ -23,9 +23,9 @@
 
 - **C**
 - **C++**
-- **CENSORED**
+- **C#**
 - **Go**
 - **Java**
 - **HTML** / **JavaScript**
-- **CENSORED**
+- **Python**
 - **Rust**
