@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     inputFile.read(reinterpret_cast<char *>(buffer.data()), buffer.size());
 
     // Проверка чанка заголовка
-    if (buffer != std::array<u_int8_t, 6>{0x89, 'Z', 'P', 'I', 'F', 0x0A})
+    if (buffer != std::array<uint8_t, 6>{0x89, 'Z', 'P', 'I', 'F', 0x0A})
     {
         cerr << "\033[1;31mError 1: The file is damaged or the format is not supported.\033[0m" << std::endl;
         return -1;
