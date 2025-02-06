@@ -9,6 +9,7 @@
 - **C#**  
 - **Go**  
 - **Java**  
+- **Android (Java)**
 - **HTML / JavaScript**  
 - **Python**  
 - **Rust**
@@ -26,6 +27,7 @@
 - **C#**
 - **Go**
 - **Java**
+- **Android (Java)**
 - **HTML** / **JavaScript**
 - **Python**
 - **Rust**
