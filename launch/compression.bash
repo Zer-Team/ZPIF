@@ -1,6 +1,6 @@
 #!/bin/sh
 
-readonly x='/home/admin/test.zpif'
+readonly path='/home/admin/test.zpif'
 
 clear
 cd ./compression
