@@ -12,6 +12,7 @@
 - **Android (Java)**
 - **HTML / JavaScript**  
 - **Python**  
+- **Ruby**
 - **Rust**
 
 <br>
@@ -30,4 +31,5 @@
 - **Android (Java)**
 - **HTML** / **JavaScript**
 - **Python**
+- **Ruby**
 - **Rust**
