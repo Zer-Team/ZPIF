@@ -21,94 +21,95 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 */
+
+////////////////////////////////////////////////////////////////
+///                        GCC 14.2.1                        ///
+///                          C++ 20                          ///
+////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////
+///                        ID: HM0100                        ///
+///                     Date: 2025-02-07                     ///
+///                     Author: Zer Team                     ///
+////////////////////////////////////////////////////////////////
+
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <ctime>
-#include <stdint.h>
-
-#define NPOS std::string::npos
+#include <cstdint>
 
 // Преобразование числа в big-endian
-inline void convertNumberInBE(u_short value, std::vector<u_int8_t> &buffer, uint8_t shift = 0)
+inline void convertNumberInBE(uint16_t value, std::vector<uint8_t> &buffer, uint8_t shift = 0)
 {
-    buffer[0+shift] = value >> 8;
-    buffer[1+shift] = value & 0xFF;
+    buffer[0 + shift] = value >> 8;
+    buffer[1 + shift] = value & 0xFF;
 }
 
 void compress_rle(std::ifstream &inputFile, std::ofstream &outputFile)
 {
     std::vector<u_int8_t> bufferInp(6), // Буфер для чтения
                           bufferOut(6); // Буфер для записи
-    unsigned short count = 1;
+    std::vector<uint8_t>  fileBuffer;   // Буфер для накопления данных перед записью
+    uint16_t count = 1;
 
-    // Проверка чанка заголовка
     inputFile.read(reinterpret_cast<char *>(bufferInp.data()), bufferInp.size());
-    if (bufferInp !=  std::vector<u_int8_t>{0x89, 'Z', 'P', 'I', 'F', 0x0A})
+    if (bufferInp != std::vector<uint8_t>{0x89, 'Z', 'P', 'I', 'F', 0x0A})
         return;
 
-    outputFile.write("\x89ZPIF\x0A", 6);
+    fileBuffer.insert(fileBuffer.end(), bufferInp.begin(), bufferInp.end());
 
-    // Работа с чанками параметров 
     while (inputFile.read(reinterpret_cast<char *>(bufferInp.data()), bufferInp.size()))
     {
-        // Завершаем работы при нахождении чанка структурирования
-        if (bufferInp == std::vector<u_int8_t>{0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF})
+        if (bufferInp == std::vector<uint8_t>{0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF})
             break;
         
-        if (bufferInp[0] == 0x74) // t
-        {
-            std::time_t nowTime = std::time(nullptr);             // Получения текущее время
-            std::tm *localTime = std::localtime(&nowTime);        // Преобразования в локальное время
+        // if (bufferInp[0] == 0x74) // t
+        // {
+        //     std::time_t nowTime = std::time(nullptr);
+        //     std::tm *localTime = std::localtime(&nowTime);
 
-            convertNumberInBE(static_cast<u_short>(localTime->tm_year + 1900), bufferOut, 1); // Преобразования года
-            
-            bufferOut[0] = 0x74; // t
-            bufferOut[3] = static_cast<u_int8_t>(localTime->tm_mon + 1);
-            bufferOut[4] = static_cast<u_int8_t>(localTime->tm_mday);
-            bufferOut[5] = static_cast<u_int8_t>(localTime->tm_hour);
-        }
+        //     convertNumberInBE(static_cast<uint16_t>(localTime->tm_year + 1900), bufferOut, 1);
+        //     bufferOut[0] = 0x74;
+        //     bufferOut[3] = static_cast<uint8_t>(localTime->tm_mon + 1);
+        //     bufferOut[4] = static_cast<uint8_t>(localTime->tm_mday);
+        //     bufferOut[5] = static_cast<uint8_t>(localTime->tm_hour);
+        // }
+
         else
             bufferOut = bufferInp;
 
-        outputFile.write(reinterpret_cast<char *>(bufferOut.data()), bufferOut.size());
+        fileBuffer.insert(fileBuffer.end(), bufferOut.begin(), bufferOut.end());
     }
-    
-    outputFile.write("\x00\x00\xFF\xFF\xFF\xFF", 6);
+    fileBuffer.insert(fileBuffer.end(), {0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF});
 
-    // Работа с чанками пикселями
     if (inputFile.read(reinterpret_cast<char *>(bufferOut.data()), bufferOut.size()))
     {
-        // Чтения остальных чанков
         while (inputFile.read(reinterpret_cast<char *>(bufferInp.data()), bufferInp.size()))
         {
-            // Завершаем сжатие при встрече 6 нулевых байтов (конца файла)
-            if (bufferInp == std::vector<u_int8_t>(6, 0x00))
+            if (bufferInp == std::vector<uint8_t>(6, 0x00))
                 break;
 
-            // Проверка данных из буфера out и буфера inp (одинаковые ли они) и не превышает ли count двух байтов
             if (bufferInp == bufferOut && count < 65535)
                 count++;
             else
             {
-                // Проверка нужна ли запись count в блок буфера
                 if (count > 1)
-                {
                     convertNumberInBE(count, bufferOut);
-                }
-                outputFile.write(reinterpret_cast<char *>(bufferOut.data()), bufferOut.size());
+                fileBuffer.insert(fileBuffer.end(), bufferOut.begin(), bufferOut.end());
                 bufferOut = bufferInp;
                 count = 1;
             }
         }
         if (count > 1)
-        {
             convertNumberInBE(count, bufferOut);
-        }
-        outputFile.write(reinterpret_cast<char *>(bufferOut.data()), bufferOut.size());
+        fileBuffer.insert(fileBuffer.end(), bufferOut.begin(), bufferOut.end());
     }
-    
-    outputFile.write("\x00\x00\x00\x00\x00\x00", 6);
+    fileBuffer.insert(fileBuffer.end(), {0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
+
+    outputFile.write(reinterpret_cast<char *>(fileBuffer.data()), fileBuffer.size());
+
+    std::cout << "\033[1;32mCompression complite\033[0m" << std::endl;
 }
 
 int main(int argc, char *argv[])
@@ -116,21 +117,19 @@ int main(int argc, char *argv[])
     if (argc != 3)
     {
         std::cerr << "Usage: " << argv[0] << " <input_file> <output_file>\n";
-        // return 1;
+        return 1;
     }
 
-    std::ifstream input_file(argv[1], std::ios::binary);
+    std::ifstream input_file (argv[1], std::ios::binary);
     std::ofstream output_file(argv[2], std::ios::binary);
+
     if (!input_file || !output_file)
     {
-        std::cerr << "Error opening input file\n";
+        std::cerr << "Error opening file\n";
         return 1;
     }
 
     compress_rle(input_file, output_file);
-
-    input_file.close();
-    output_file.close();
 
     return 0;
 }

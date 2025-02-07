@@ -1,0 +1,5 @@
+*.zpif
+*.exe
+*.dll
+*.pdb
+*.user
