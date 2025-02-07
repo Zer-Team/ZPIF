@@ -4,12 +4,12 @@
 
 ## Languages with implementations  
 
+- **Android (Java)**
 - **C**  
 - **C++**  
 - **C#**  
 - **Go**  
 - **Java**  
-- **Android (Java)**
 - **HTML / JavaScript**  
 - **Python**  
 - **Ruby**
