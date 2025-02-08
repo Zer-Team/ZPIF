@@ -92,11 +92,23 @@ wNNNNNhNNNNNtN�NNNNN����NN�NN�NNNNNN
 
 <br>
 
+# Embedding in Your Projects  
+
+If you are interested in the **ZPIF** format and want to use it in your projects, you can find implementations for rendering **ZPIF** images in various programming languages in the `render/` directory.  
+
+If an implementation for your preferred language is not available, you can create one yourself and submit it to us. If it meets the quality standards, we will publish your version.  
+
+We greatly appreciate your contribution to the development of the **Zer Projects Image Format**!
+
+<br>
+<br>
+<br>
+
 **Русский (original)**
 
 # Описание формата файлов ZPIF
 
-ZPIF (Zer Project Image Format) — это свободный растровый формат для хранения графической информации.
+ZPIF (Zer Project Images Format) — это свободный растровый формат для хранения графической информации.
 
 ## Структура файла
 
@@ -165,9 +177,12 @@ ZPIF (Zer Project Image Format) — это свободный растровый
 ### Пример 1 (бинарное представление в hex)
 
 ```
-89 5A 50 49 46 0A 77 00 00 00 02 00 
-68 00 00 00 02 00 74 07 E9 02 01 0C 
-00 00 FF FF FF FF 00 04 FF 00 00 FF 
+89 5A 50 49 46 0A
+77 00 00 00 02 00 
+68 00 00 00 02 00 
+74 07 E9 02 01 0C 
+00 00 FF FF FF FF
+00 04 FF 00 00 FF 
 00 00 00 00 00 00
 ```
 
@@ -181,3 +196,13 @@ wNNNNNhNNNNNtN�NNNNN����NN�NN�NNNNNN
 ## Примечания
 
 1. После чанка `00 00 00 00 00 00` (конца файла) могут быть записаны любые данные, но этого следует избегать.
+
+<br>
+ 
+# Встраивание в свои проекты  
+
+Если вас заинтересовал формат **ZPIF** и вы хотите использовать его в своих проектах, в директории `render/` вы найдете реализации рендеринга изображений **ZPIF** на различных языках программирования.  
+
+Если нужной вам реализации нет, вы можете создать её самостоятельно и отправить нам. Если всё будет выполнено качественно, мы опубликуем вашу версию.  
+
+Мы будем очень благодарны за ваш вклад в развитие **Zer Projects Image Format**!  
