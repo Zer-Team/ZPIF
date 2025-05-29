@@ -24,13 +24,13 @@
 
 ////////////////////////////////////////////////////////////////
 ///                        GCC 14.2.1                        ///
-///                        SFML 2.6.2                        ///
+///                        SFML 3.0.0                        ///
 ///                          C++ 20                          ///
 ////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////
 ///                        ID: HM0100                        ///
-///                     Date: 2025-02-06                     ///
+///                     Date: 2025-05-29                     ///
 ///                     Author: Zer Team                     ///
 ////////////////////////////////////////////////////////////////
 
@@ -126,14 +126,20 @@ int main(int argc, char *argv[])
     }
          
     // Создания окно
-    sf::RenderWindow window(sf::VideoMode(imageWidth * factor, imageHeight * factor), "ZPIF Render C++", sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(sf::Vector2u(imageWidth * factor, imageHeight * factor)), "ZPIF Render C++", sf::Style::Close);
+
+    // Установка позиции окна
+    window.setPosition(sf::Vector2i(((sf::VideoMode::getDesktopMode().size.x - window.getSize().x) / 2), ((sf::VideoMode::getDesktopMode().size.y - window.getSize().y) / 2)));
 
     // Создания изображение и текстуры
     sf::Image image;
-    image.create(imageWidth, imageHeight, sf::Color::Transparent); // Изображение
+    image.resize(sf::Vector2u(imageWidth, imageHeight), sf::Color::Transparent); // Изображение
 
     sf::Texture texture;
-    texture.loadFromImage(image); // Загрузка изображение в текстуру
+    // Загрузка изображение в текстуру
+    if (!texture.loadFromImage(image)) {
+        cerr << "Error" << endl;
+    }
 
     // Создания спрайта для отображения текстуры
     sf::Sprite sprite(texture);
@@ -156,13 +162,13 @@ int main(int argc, char *argv[])
     )};
 
     // Установкам масштаба спрайта
-    backgroundSprite.setScale(scaleBackgroundSprite, scaleBackgroundSprite);
+    backgroundSprite.setScale(sf::Vector2f(scaleBackgroundSprite, scaleBackgroundSprite));
 
     // Централизация текстуру
-    backgroundSprite.setPosition(
+    backgroundSprite.setPosition(sf::Vector2f(
         (static_cast<float>(window.getSize().x) - backgroundTexture.getSize().x * scaleBackgroundSprite) / 2.f,
         (static_cast<float>(window.getSize().y) - backgroundTexture.getSize().y * scaleBackgroundSprite) / 2.f
-    );
+    ));
 
     // Парсинг пикселей из файла (работа с чанками пикселей)
     while (inputFile.read(reinterpret_cast<char *>(buffer.data()), buffer.size()))
@@ -175,7 +181,7 @@ int main(int argc, char *argv[])
         sf::Color color(buffer[2], buffer[3], buffer[4], buffer[5]);
 
         for (uint16_t i = 0; i < quantity; ++i) {
-            image.setPixel((pixelPoint % imageWidth), (pixelPoint / imageWidth), color);
+            image.setPixel(sf::Vector2u((pixelPoint % imageWidth), (pixelPoint / imageWidth)), color);
             pixelPoint++;
         }
     }
@@ -184,18 +190,18 @@ int main(int argc, char *argv[])
     texture.update(image);
     
     // Растягивание текстуры
-    sprite.setScale(imageWidth * factor / texture.getSize().x, imageHeight * factor / texture.getSize().y);
+    sprite.setScale(sf::Vector2f(imageWidth * factor / texture.getSize().x, imageHeight * factor / texture.getSize().y));
 
     // Основной цикл программы
     while (window.isOpen())
     {
-        sf::Event event;
-
         // Обработка событий
-        while (window.pollEvent(event))
+        while (std::optional<sf::Event> event = window.pollEvent())
         {
+            const auto *keyEvent = event->getIf<sf::Event::KeyPressed>(); // Работа с клавиатурой
+
             // Закрытие окна
-            if (event.type == sf::Event::Closed)
+            if (event->is<sf::Event::Closed>() || event->is<sf::Event::KeyPressed>() && keyEvent->scancode == sf::Keyboard::Scan::Escape)
                 window.close();
         }
 
